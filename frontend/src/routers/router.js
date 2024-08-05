@@ -5,6 +5,7 @@ import Login from "../components/Login.vue";
 import SignUp from "../components/SignUp.vue";
 import AdminHome from "../components/AdminHome.vue";
 import ManageSections from "../components/ManageSections.vue";
+import ManageBooks from "../components/ManageBooks.vue";
 
 const routes = [
   {
@@ -31,6 +32,11 @@ const routes = [
     path: "/admin/manage-sections",
     name: "manageSections",
     component: ManageSections,
+  },
+  {
+    path: "/admin/manage-books",
+    name: "manageBooks",
+    component: ManageBooks,
   },
   // Add more routes here
 ];
