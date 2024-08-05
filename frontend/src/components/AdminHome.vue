@@ -29,6 +29,11 @@
 </template>
 
 <script>
+import booksImage from "../assets/images/books.webp";
+import sectionsImage from "../assets/images/sections.svg";
+import userImage from "../assets/images/user.png";
+import requestsImage from "../assets/images/requests.svg";
+
 export default {
   name: "AdminHome",
   data() {
@@ -37,22 +42,22 @@ export default {
       options: [
         {
           title: "Manage Books",
-          image: new URL("@/assets/images/books.webp", import.meta.url).href,
+          image: booksImage,
           link: "/manage-books",
         },
         {
           title: "Manage Sections",
-          image: new URL("@/assets/images/sections.svg", import.meta.url).href,
+          image: sectionsImage,
           link: "/manage-sections",
         },
         {
           title: "Manage Users",
-          image: new URL("@/assets/images/user.png", import.meta.url).href,
+          image: userImage,
           link: "/manage-users",
         },
         {
           title: "Manage Requests",
-          image: new URL("@/assets/images/requests.svg", import.meta.url).href,
+          image: requestsImage,
           link: "/manage-requests",
         },
       ],
