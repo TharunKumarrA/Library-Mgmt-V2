@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import booksImage from "../assets/images/books.webp";
+import booksImage from "../assets/images/books.png";
 import sectionsImage from "../assets/images/sections.svg";
 import userImage from "../assets/images/user.png";
 import requestsImage from "../assets/images/requests.svg";
@@ -43,22 +43,22 @@ export default {
         {
           title: "Manage Books",
           image: booksImage,
-          link: "/manage-books",
+          link: "/admin/manage-books",
         },
         {
           title: "Manage Sections",
           image: sectionsImage,
-          link: "/manage-sections",
+          link: "/admin/manage-sections",
         },
         {
           title: "Manage Users",
           image: userImage,
-          link: "/manage-users",
+          link: "/admin/manage-users",
         },
         {
           title: "Manage Requests",
           image: requestsImage,
-          link: "/manage-requests",
+          link: "/admin/manage-requests",
         },
       ],
     };

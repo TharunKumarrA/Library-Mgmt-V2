@@ -4,6 +4,7 @@ import userHome from "../components/userHome.vue";
 import Login from "../components/Login.vue";
 import SignUp from "../components/SignUp.vue";
 import AdminHome from "../components/AdminHome.vue";
+import ManageSections from "../components/ManageSections.vue";
 
 const routes = [
   {
@@ -25,6 +26,11 @@ const routes = [
     path: "/admin",
     name: "adminHome",
     component: AdminHome,
+  },
+  {
+    path: "/admin/manage-sections",
+    name: "manageSections",
+    component: ManageSections,
   },
   // Add more routes here
 ];
