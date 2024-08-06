@@ -1,6 +1,6 @@
 from flask import Flask
 from endpoints import ep
-from render import render
+from flask_cors import CORS
 import secrets
 import os
 
@@ -13,8 +13,9 @@ uploadPath = abs[0:-6]+"uploads"
 app.config['UPLOAD_FOLDER'] = uploadPath
 
 app.secret_key = secret_key
+
+CORS(app)
 app.register_blueprint(ep)
-app.register_blueprint(render)
 
 if __name__ == '__main__':
     app.run(debug=True)

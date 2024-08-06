@@ -21,6 +21,22 @@ create_tables()
 
 ep = Blueprint('endpoints', __name__)
 
+@ep.route('/api/check_session', methods=['GET'])
+def check_session():
+    try:
+        if 'username' in session:
+            return jsonify({
+                'sessionId': session.get('sessionId'),
+                'username': session.get('username'),
+                'isAdmin': session.get('isAdmin')
+            }), 200
+        else:
+            abort(401)  # Unauthorized
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        abort(500)  # Internal server error
+
+
 @ep.route('/api/login', methods=['POST'])
 def login():
     try:

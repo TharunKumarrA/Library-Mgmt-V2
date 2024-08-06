@@ -37,9 +37,9 @@
                 />
               </div>
               <div class="mb-3">
-                <label for="confirmPassword" class="form-label"
-                  >Confirm Password:</label
-                >
+                <label for="confirmPassword" class="form-label">
+                  Confirm Password:
+                </label>
                 <input
                   type="password"
                   class="form-control bg-dark text-light border-light"
@@ -96,6 +96,9 @@
 </template>
 
 <script>
+import axios from "../routers/axios.js";
+import { Toast } from "bootstrap";
+
 export default {
   name: "SignUp",
   data() {
@@ -116,17 +119,64 @@ export default {
     },
   },
   methods: {
-    submitForm() {
-      // Handle form submission here
-      console.log("Form submitted", {
+    async submitForm() {
+      const apiUrl = "/register";
+      const requestData = {
         username: this.username,
         name: this.name,
         password: this.password,
         isAdmin: this.isAdmin,
-      });
+      };
 
-      // Example: Display toast message on form submission
-      this.toastMessage = "Registration successful!";
+      console.log("Submitting form with data:", requestData);
+      console.log("API URL:", apiUrl);
+
+      try {
+        const response = await axios.post(apiUrl, requestData);
+
+        console.log("Response status:", response.status);
+        console.log("Response data:", response.data);
+
+        if (response.status === 200) {
+          this.toastMessage = "Registration successful!";
+          this.$router.push("/login");
+        }
+      } catch (error) {
+        console.error("Error occurred:", error);
+
+        if (error.response) {
+          console.error("Response status:", error.response.status);
+          console.error("Response data:", error.response.data);
+
+          switch (error.response.status) {
+            case 400:
+              this.toastMessage = "Bad request. Please check your input.";
+              break;
+            case 409:
+              this.toastMessage =
+                "Username already exists. Please choose another.";
+              break;
+            case 500:
+              this.toastMessage =
+                "An error occurred on the server. Please try again later.";
+              break;
+            default:
+              this.toastMessage = "An error occurred. Please try again.";
+          }
+        } else {
+          this.toastMessage = "Network error. Please check your connection.";
+        }
+      } finally {
+        this.$nextTick(() => {
+          if (this.toastMessage) {
+            const toastElement = document.querySelector(".toast");
+            if (toastElement) {
+              const toast = new Toast(toastElement);
+              toast.show();
+            }
+          }
+        });
+      }
     },
     closeToast() {
       this.toastMessage = "";
@@ -138,5 +188,8 @@ export default {
 <style scoped>
 .container {
   max-width: 800px;
+}
+.toast {
+  margin-bottom: 16px;
 }
 </style>

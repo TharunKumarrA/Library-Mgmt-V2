@@ -31,9 +31,9 @@
               </button>
               <p class="mt-3">
                 Don't have an account?
-                <router-link to="/signup" class="text-info"
-                  >Sign Up</router-link
-                >
+                <router-link to="/signup" class="text-info">
+                  Sign Up
+                </router-link>
               </p>
             </form>
           </div>
@@ -62,6 +62,9 @@
 </template>
 
 <script>
+import axios from "../routers/axios.js"; // Adjust the import path if necessary
+import { Toast } from "bootstrap";
+
 export default {
   name: "Login",
   data() {
@@ -72,15 +75,61 @@ export default {
     };
   },
   methods: {
-    submitForm() {
-      // Handle form submission here
-      console.log("Form submitted", {
+    async submitForm() {
+      const apiUrl = "/login";
+      const requestData = {
         username: this.username,
         password: this.password,
-      });
+      };
 
-      // Example: Display toast message on form submission
-      this.toastMessage = "Form submitted successfully!";
+      console.log("Submitting form with data:", requestData);
+      console.log("API URL:", apiUrl);
+
+      try {
+        const response = await axios.post(apiUrl, requestData);
+
+        console.log("Response status:", response.status);
+        console.log("Response data:", response.data);
+
+        if (response.status === 200) {
+          this.toastMessage = "Login successful!";
+          this.$router.push("/"); // Redirect to a different page after successful login
+        }
+      } catch (error) {
+        console.error("Error occurred:", error);
+
+        if (error.response) {
+          console.error("Response status:", error.response.status);
+          console.error("Response data:", error.response.data);
+
+          switch (error.response.status) {
+            case 400:
+              this.toastMessage = "Bad request. Please check your input.";
+              break;
+            case 401:
+              this.toastMessage = "Invalid credentials. Please try again.";
+              break;
+            case 500:
+              this.toastMessage =
+                "An error occurred on the server. Please try again later.";
+              break;
+            default:
+              this.toastMessage = "An error occurred. Please try again.";
+          }
+        } else {
+          this.toastMessage = "Network error. Please check your connection.";
+        }
+      } finally {
+        this.$nextTick(() => {
+          if (this.toastMessage) {
+            const toastElement = document.querySelector(".toast");
+            if (toastElement) {
+              const toast = new Toast(toastElement);
+              toast.show();
+            }
+          }
+        });
+      }
     },
     closeToast() {
       this.toastMessage = "";

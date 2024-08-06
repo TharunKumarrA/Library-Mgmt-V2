@@ -83,49 +83,52 @@
 </template>
 
 <script>
+import { ref, onMounted } from "vue";
+import axios from "../routers/axios.js"; // Adjust the import path if necessary
+
 export default {
-  name: "Home",
-  data() {
+  name: "YourComponent",
+  setup() {
+    const username = ref("");
+    const borrowedBooks = ref([]);
+
+    const checkSession = async () => {
+      try {
+        const response = await axios.get("/check_session");
+        if (response.status === 200) {
+          const { sessionId, username: user, isAdmin } = response.data;
+          localStorage.setItem("sessionId", sessionId);
+          localStorage.setItem("username", user);
+          localStorage.setItem("isAdmin", isAdmin);
+          username.value = user;
+          console.log("Session is active");
+        }
+      } catch (error) {
+        if (error.response && error.response.status === 401) {
+          // Not logged in, redirect to login page
+          window.location.href = "/login"; // Use window.location.href for navigation
+        } else {
+          console.error("Error checking session:", error);
+        }
+      }
+    };
+
+    onMounted(() => {
+      checkSession();
+    });
+
     return {
-      borrowedBooks: [],
-      username: "Tharun", // You'll need to set this from your authentication system
+      username,
+      borrowedBooks,
+      checkSession,
     };
   },
-  mounted() {
-    this.fetchBorrowedBooks();
-  },
   methods: {
-    async fetchBorrowedBooks() {
-      try {
-        // Replace with your actual API endpoint
-        const response = await fetch("/api/borrowed-books");
-        if (!response.ok) {
-          throw new Error("Failed to fetch borrowed books");
-        }
-        this.borrowedBooks = await response.json();
-      } catch (error) {
-        console.error("Error fetching borrowed books:", error);
-        // You might want to show an error message to the user here
-      }
-    },
-    async revokeBook(bookId) {
-      try {
-        const response = await fetch(`/api/revoke/${this.username}/${bookId}`, {
-          method: "POST",
-        });
-        if (!response.ok) {
-          throw new Error("Failed to revoke book");
-        }
-        // Refresh the borrowed books list
-        this.fetchBorrowedBooks();
-      } catch (error) {
-        console.error("Error revoking book:", error);
-        // You might want to show an error message to the user here
-      }
-    },
     readBook(title) {
-      // Implement your read book functionality here
       console.log(`Reading book: ${title}`);
+    },
+    revokeBook(bookId) {
+      console.log(`Revoking book with ID: ${bookId}`);
     },
   },
 };
