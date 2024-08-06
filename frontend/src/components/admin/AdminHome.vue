@@ -29,10 +29,10 @@
 </template>
 
 <script>
-import booksImage from "../assets/images/books.png";
-import sectionsImage from "../assets/images/sections.svg";
-import userImage from "../assets/images/user.png";
-import requestsImage from "../assets/images/requests.svg";
+import booksImage from "../../assets/images/books.png";
+import sectionsImage from "../../assets/images/sections.svg";
+import userImage from "../../assets/images/user.png";
+import requestsImage from "../../assets/images/requests.svg";
 
 export default {
   name: "AdminHome",
