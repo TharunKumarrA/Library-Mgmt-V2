@@ -1,28 +1,33 @@
 <template>
-  <div class="container text-white">
-    <h1>All Books</h1>
-    <table class="table table-bordered table-dark">
-      <thead>
-        <tr>
-          <th>Title</th>
-          <th>Author</th>
-          <th>Copies Present</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="book in books" :key="book[0]">
-          <td>{{ book[1] }}</td>
-          <td>{{ book[2] }}</td>
-          <td>{{ book[5] }}</td>
-          <td>
-            <button class="btn btn-primary" @click="openRequestModal(book[0])">
-              Request
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+  <div class="container text-white py-5">
+    <h1 class="mb-4 text-center">Library Catalog</h1>
+    <div class="table-responsive">
+      <table class="table table-hover table-dark">
+        <thead class="thead-light">
+          <tr>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Copies Available</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="book in books" :key="book[0]">
+            <td>{{ book[1] }}</td>
+            <td>{{ book[2] }}</td>
+            <td>{{ book[5] }}</td>
+            <td>
+              <button
+                class="btn btn-primary btn-sm"
+                @click="openRequestModal(book[0])"
+              >
+                Request Book
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
     <!-- Request Modal -->
     <div
@@ -33,11 +38,11 @@
       aria-hidden="true"
       ref="modal"
     >
-      <div class="modal-dialog">
+      <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content bg-dark text-white">
-          <div class="modal-header">
+          <div class="modal-header border-bottom border-secondary">
             <h5 class="modal-title" id="requestModalLabel">
-              Request Book - {{ selectedBook ? selectedBook[1] : "" }}
+              Request Book: {{ selectedBook ? selectedBook[1] : "" }}
             </h5>
             <button
               type="button"
@@ -47,7 +52,6 @@
             ></button>
           </div>
           <div class="modal-body">
-            <!-- Request Form -->
             <form @submit.prevent="submitRequest">
               <input type="hidden" name="action" value="request" />
               <input
@@ -60,7 +64,7 @@
                 <label
                   :for="'requestDate' + (selectedBook ? selectedBook[0] : '')"
                   class="form-label"
-                  >Till Date</label
+                  >Return By</label
                 >
                 <input
                   type="input"
@@ -72,12 +76,16 @@
               </div>
             </form>
           </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" @click="closeModal">
-              Close
+          <div class="modal-footer border-top border-secondary">
+            <button
+              type="button"
+              class="btn btn-outline-light"
+              @click="closeModal"
+            >
+              Cancel
             </button>
             <button type="button" @click="submitRequest" class="btn btn-danger">
-              Submit
+              Confirm Request
             </button>
           </div>
         </div>
@@ -86,12 +94,11 @@
 
     <!-- Toast component -->
     <div
-      class="toast align-items-center text fixed-bottom start-50 translate-middle-x text-bg-primary border-0"
+      class="toast align-items-center text-white bg-primary border-0 position-fixed bottom-0 start-50 translate-middle-x mb-4"
       role="alert"
-      aria-live="polite"
+      aria-live="assertive"
       aria-atomic="true"
       ref="toast"
-      style="margin-bottom: 16px"
     >
       <div class="d-flex">
         <div class="toast-body">{{ toastMessage }}</div>
@@ -179,11 +186,35 @@ export default {
 </script>
 
 <style scoped>
+.table {
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+.table thead th {
+  background-color: #343a40;
+  border-color: #454d55;
+}
+
+.table-hover tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.075);
+}
+
 .modal-content {
   background-color: #343a40 !important;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
+
 .form-control:disabled {
   background-color: #6c757d !important;
   color: white !important;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn-close:focus {
+  box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.25);
+}
+
+.toast {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
 }
 </style>
