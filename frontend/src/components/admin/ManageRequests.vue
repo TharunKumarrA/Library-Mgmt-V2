@@ -1,6 +1,8 @@
 <template>
   <div class="container text-white">
-    <h1>Book Requests</h1>
+    <div class="text-center mb-5">
+      <h1>Book Requests</h1>
+    </div>
     <table class="table table-bordered table-dark">
       <thead>
         <tr>
