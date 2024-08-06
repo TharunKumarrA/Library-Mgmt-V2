@@ -39,13 +39,9 @@
                   />
                 </div>
                 <div class="d-grid">
-                  <button
-                    type="submit"
-                    class="btn btn-primary"
-                    :disabled="loading"
-                  >
+                  <button type="submit" class="btn btn-primary" :disabled="loading">
                     <i class="bi bi-search me-2"></i>
-                    {{ loading ? "Searching..." : "Search" }}
+                    {{ loading ? 'Searching...' : 'Search' }}
                   </button>
                 </div>
               </form>
@@ -80,10 +76,7 @@
                       <td>{{ book[2] }}</td>
                       <td>{{ book[3] }}</td>
                       <td>
-                        <button
-                          class="btn btn-sm btn-primary"
-                          @click="requestBook(book[0])"
-                        >
+                        <button class="btn btn-sm btn-primary" @click="requestBook(book[0])">
                           Request
                         </button>
                       </td>
@@ -91,9 +84,7 @@
                   </tbody>
                 </table>
               </div>
-              <p v-else-if="searched && !loading" class="text-muted">
-                No books found.
-              </p>
+              <p v-else-if="searched && !loading" class="text-muted">No books found.</p>
             </div>
           </div>
         </div>
@@ -104,19 +95,19 @@
 
 <script>
 export default {
-  name: "SearchBooks",
+  name: 'SearchBooks',
   data() {
     return {
       searchForm: {
-        title: "",
-        author: "",
-        section: "",
+        title: '',
+        author: '',
+        section: ''
       },
       books: [],
       searched: false,
       loading: false,
-      error: null,
-    };
+      error: null
+    }
   },
   methods: {
     async searchBooks() {
@@ -127,10 +118,10 @@ export default {
 
       try {
         // Replace this with your actual API call
-        const response = await fetch("/api/search", {
-          method: "POST",
+        const response = await fetch('/api/search', {
+          method: 'POST',
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
           },
           body: JSON.stringify(this.searchForm),
         });
@@ -144,13 +135,13 @@ export default {
         if (Array.isArray(data)) {
           this.books = data;
         } else {
-          throw new Error("Invalid data format received from server");
+          throw new Error('Invalid data format received from server');
         }
 
         this.searched = true;
       } catch (err) {
-        console.error("Search error:", err);
-        this.error = "An error occurred while searching. Please try again.";
+        console.error('Search error:', err);
+        this.error = 'An error occurred while searching. Please try again.';
       } finally {
         this.loading = false;
       }
@@ -158,9 +149,9 @@ export default {
     requestBook(bookId) {
       // Implement book request functionality
       console.log(`Requesting book with ID: ${bookId}`);
-    },
-  },
-};
+    }
+  }
+}
 </script>
 
 <style scoped>
