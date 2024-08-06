@@ -5,7 +5,7 @@
       <div class="col-md-6">
         <!-- Welcome section -->
         <div class="p-3 mb-4 bg-dark rounded-3">
-          <h1 class="display-4">Welcome to the Library</h1>
+          <h1 class="display-4">Welcome, {{ username }}</h1>
           <p class="lead">
             This is your personal library dashboard. Here you can manage your
             borrowed books and explore new ones.
@@ -88,7 +88,7 @@ export default {
   data() {
     return {
       borrowedBooks: [],
-      username: "", // You'll need to set this from your authentication system
+      username: "Tharun", // You'll need to set this from your authentication system
     };
   },
   mounted() {
