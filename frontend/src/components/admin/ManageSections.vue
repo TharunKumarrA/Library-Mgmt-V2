@@ -1,63 +1,68 @@
 <template>
   <div
-    class="d-flex justify-content-center align-items-center bg-dark text-white"
+    class="d-flex bg-dark text-white min-vh-100 py-5"
   >
     <div class="container">
-      <!-- Button group for add, edit, delete -->
-      <div class="row mb-4">
-        <div class="col-md-3">
-          <div class="btn-group-vertical" role="group">
-            <button
-              type="button"
-              class="btn btn-primary btn-block mb-3"
-              @click="showModal('add')"
-            >
-              Add Section
-            </button>
-            <button
-              type="button"
-              class="btn btn-secondary btn-block mb-3"
-              @click="showModal('edit')"
-              :disabled="!selectedSection"
-            >
-              Edit Section
-            </button>
-            <button
-              type="button"
-              class="btn btn-danger btn-block"
-              @click="showModal('delete')"
-              :disabled="!selectedSection"
-            >
-              Delete Section
-            </button>
+      <h1 class="text-center mb-5">Section Management System</h1>
+      <div class="row">
+        <div class="col-md-3 mb-4">
+          <div class="card bg-secondary text-white">
+            <div class="card-body">
+              <h5 class="card-title mb-3">Actions</h5>
+              <div class="d-grid gap-2">
+                <button class="btn btn-primary" @click="showModal('add')">
+                  <i class="bi bi-plus-circle me-2"></i>Add Section
+                </button>
+                <button
+                  class="btn btn-warning"
+                  @click="showModal('edit')"
+                  :disabled="!selectedSection"
+                >
+                  <i class="bi bi-pencil me-2"></i>Edit Section
+                </button>
+                <button
+                  class="btn btn-danger"
+                  @click="showModal('delete')"
+                  :disabled="!selectedSection"
+                >
+                  <i class="bi bi-trash me-2"></i>Delete Section
+                </button>
+              </div>
+            </div>
           </div>
         </div>
         <div class="col-md-9">
-          <!-- Table to display sections -->
-          <table class="table table-hover table-dark">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Description</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                v-for="section in sections"
-                :key="section[0]"
-                @click="selectSection(section)"
-                :class="{
-                  'table-active':
-                    selectedSection && selectedSection[0] === section[0],
-                }"
-              >
-                <td>{{ section[0] }}</td>
-                <td>{{ section[1] }}</td>
-                <td>{{ section[2] }}</td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="card bg-dark text-white border-light">
+            <div class="card-body">
+              <h5 class="card-title mb-3">Sections Inventory</h5>
+              <div class="table-responsive">
+                <table class="table table-hover table-dark">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Name</th>
+                      <th>Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr
+                      v-for="section in sections"
+                      :key="section[0]"
+                      @click="selectSection(section)"
+                      :class="{
+                        'table-active':
+                          selectedSection && selectedSection[0] === section[0],
+                      }"
+                    >
+                      <td>{{ section[0] }}</td>
+                      <td>{{ section[1] }}</td>
+                      <td>{{ section[2] }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -83,12 +88,11 @@
 
     <!-- Toast message -->
     <div
-      class="toast align-items-center text fixed-bottom start-50 translate-middle-x text-bg-primary border-0"
+      class="toast align-items-center text-white bg-primary border-0 position-fixed bottom-0 start-50 translate-middle-x mb-4"
       role="alert"
-      aria-live="polite"
+      aria-live="assertive"
       aria-atomic="true"
       ref="toast"
-      style="margin-bottom: 16px"
     >
       <div class="d-flex">
         <div class="toast-body">{{ toastMessage }}</div>
@@ -209,6 +213,11 @@ export default {
   background-color: #121212 !important;
 }
 
+.card {
+  border: none;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
 .table-dark {
   color: #fff;
   background-color: #343a40;
@@ -216,5 +225,9 @@ export default {
 
 .table-active {
   background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.btn i {
+  font-size: 0.9rem;
 }
 </style>

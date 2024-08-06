@@ -1,56 +1,60 @@
 <template>
-  <div class="container text-white">
-    <div class="row">
+  <div class="container text-white mt-5">
+    <div class="row justify-content-center">
       <div class="col-md-6">
-        <h2>Profile</h2>
-        <form @submit.prevent="saveProfile">
-          <div class="form-group">
-            <label for="username">Username</label>
-            <input
-              type="text"
-              class="form-control bg-dark text-white"
-              id="username"
-              :value="username"
-              disabled
-            />
+        <div class="card bg-dark border-light">
+          <div class="card-body">
+            <h2 class="card-title text-center">Profile</h2>
+            <form @submit.prevent="saveProfile">
+              <div class="form-group mb-3">
+                <label for="username">Username</label>
+                <input
+                  type="text"
+                  class="form-control text-white"
+                  id="username"
+                  :value="username"
+                  disabled
+                />
+              </div>
+              <div class="form-group mb-3">
+                <label for="name">Name</label>
+                <input
+                  type="text"
+                  class="form-control text-white"
+                  id="name"
+                  v-model="name"
+                />
+              </div>
+              <div class="form-group mb-3">
+                <label for="email">Email</label>
+                <input
+                  type="email"
+                  class="form-control text-white"
+                  id="email"
+                  v-model="email"
+                  placeholder="Enter your email"
+                />
+              </div>
+              <div class="form-group mb-3">
+                <label for="bio">Bio</label>
+                <textarea
+                  class="form-control text-white"
+                  id="bio"
+                  v-model="bio"
+                  rows="3"
+                  placeholder="Enter a short bio"
+                ></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary w-100">Save</button>
+            </form>
           </div>
-          <div class="form-group">
-            <label for="name">Name</label>
-            <input
-              type="text"
-              class="form-control bg-dark text-white"
-              id="name"
-              v-model="name"
-            />
-          </div>
-          <div class="form-group">
-            <label for="email">Email</label>
-            <input
-              type="email"
-              class="form-control bg-dark text-white"
-              id="email"
-              v-model="email"
-              placeholder="Enter your email"
-            />
-          </div>
-          <div class="form-group">
-            <label for="bio">Bio</label>
-            <textarea
-              class="form-control bg-dark text-white"
-              id="bio"
-              v-model="bio"
-              rows="3"
-              placeholder="Enter a short bio"
-            ></textarea>
-          </div>
-          <button type="submit" class="btn btn-primary">Save</button>
-        </form>
+        </div>
       </div>
     </div>
 
     <!-- Toast component -->
     <div
-      class="toast align-items-center text fixed-bottom start-50 translate-middle-x text-bg-primary border-0"
+      class="toast align-items-center text-bg-primary border-0 fixed-bottom start-50 translate-middle-x"
       role="alert"
       aria-live="polite"
       aria-atomic="true"
@@ -123,12 +127,26 @@ export default {
 </script>
 
 <style scoped>
+.card {
+  border-radius: 10px;
+  color: white !important;
+}
+
 .form-control {
   background-color: #343a40 !important;
   color: white !important;
 }
+
 .form-control:focus {
   background-color: #454d55 !important;
   color: white !important;
+}
+
+.card-title {
+  margin-bottom: 20px;
+}
+
+.toast {
+  border-radius: 10px;
 }
 </style>
