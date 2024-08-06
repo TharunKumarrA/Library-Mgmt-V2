@@ -3,9 +3,14 @@ import { createRouter, createWebHistory } from "vue-router";
 import userHome from "../components/userHome.vue";
 import Login from "../components/Login.vue";
 import SignUp from "../components/SignUp.vue";
-import AdminHome from "../components/AdminHome.vue";
-import ManageSections from "../components/ManageSections.vue";
-import ManageBooks from "../components/ManageBooks.vue";
+import AdminHome from "../components/admin/AdminHome.vue";
+import ManageSections from "../components/admin/ManageSections.vue";
+import ManageBooks from "../components/admin/ManageBooks.vue";
+import ManageUsers from "../components/admin/ManageUsers.vue";
+import ManageRequests from "../components/admin/ManageRequests.vue";
+import Profile from "../components/Profile.vue";
+import Books from "../components/Books.vue";
+import Search from "../components/Search.vue";
 
 const routes = [
   {
@@ -37,6 +42,31 @@ const routes = [
     path: "/admin/manage-books",
     name: "manageBooks",
     component: ManageBooks,
+  },
+  {
+    path: "/admin/manage-users",
+    name: "manageUsers",
+    component: ManageUsers,
+  },
+  {
+    path: "/admin/manage-requests",
+    name: "manageRequests",
+    component: ManageRequests,
+  },
+  {
+    path: "/profile",
+    name: "profile",
+    component: Profile,
+  },
+  {
+    path: "/books",
+    name: "books",
+    component: Books,
+  },
+  {
+    path: "/search",
+    name: "search",
+    component: Search,
   },
   // Add more routes here
 ];
