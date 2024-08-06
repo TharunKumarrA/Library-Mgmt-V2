@@ -6,7 +6,16 @@
         <div class="navbar-collapse">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item">
-              <router-link class="nav-link" to="/">Home</router-link>
+              <router-link
+                v-if="currentRoute == '/admin' || isAdmin"
+                class="nav-link"
+                to="/admin"
+                >Home</router-link
+              >
+
+              <router-link v-else class="nav-link" to="/"
+                >Home</router-link
+              >
             </li>
             <li class="nav-item">
               <router-link class="nav-link" to="/books">Books</router-link>
@@ -46,6 +55,7 @@ export default {
   data() {
     return {
       currentRoute: this.$route.path,
+      isAdmin: false,
     };
   },
   watch: {
