@@ -58,6 +58,7 @@
 
 <script>
 import { ref } from "vue";
+import axios from "axios";
 
 export default {
   name: "AddSectionModal",
@@ -66,9 +67,17 @@ export default {
     const sectionName = ref("");
     const sectionDesc = ref("");
 
-    const submitForm = () => {
-      emit("add-section", [Date.now(), sectionName.value, sectionDesc.value]);
-      emit("close");
+    const submitForm = async () => {
+      try {
+        await axios.post("/manage/sections", {
+          name: sectionName.value,
+          desc: sectionDesc.value,
+        });
+        emit("add-section");
+        emit("close");
+      } catch (error) {
+        console.error("Error adding section:", error);
+      }
     };
 
     return {

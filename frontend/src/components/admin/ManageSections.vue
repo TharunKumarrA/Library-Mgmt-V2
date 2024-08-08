@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="d-flex bg-dark text-white min-vh-100 py-5"
-  >
+  <div class="d-flex bg-dark text-white min-vh-100 py-5">
     <div class="container">
       <h1 class="text-center mb-5">Section Management System</h1>
       <div class="row">
@@ -71,19 +69,19 @@
     <AddSectionModal
       v-if="showAddModal"
       @close="closeModal('add')"
-      @add-section="addSection"
+      @add-section="fetchSections"
     />
     <EditSectionModal
       v-if="showEditModal"
       :section="selectedSection"
       @close="closeModal('edit')"
-      @edit-section="editSection"
+      @edit-section="fetchSections"
     />
     <DeleteSectionModal
       v-if="showDeleteModal"
       :section="selectedSection"
       @close="closeModal('delete')"
-      @delete-section="deleteSection"
+      @delete-section="fetchSections"
     />
 
     <!-- Toast message -->
@@ -109,6 +107,7 @@
 
 <script>
 import { ref, onMounted } from "vue";
+import axios from "axios";
 import AddSectionModal from "./section/AddSectionModal.vue";
 import EditSectionModal from "./section/EditSectionModal.vue";
 import DeleteSectionModal from "./section/DeleteSectionModal.vue";
@@ -128,6 +127,16 @@ export default {
     const showDeleteModal = ref(false);
     const toastMessage = ref("");
 
+    const fetchSections = async () => {
+      try {
+        const response = await axios.get("/sections");
+        sections.value = response.data;
+      } catch (error) {
+        displayToast("Failed to fetch sections");
+        console.error("Error fetching sections:", error);
+      }
+    };
+
     const showModal = (type) => {
       if (type === "add") showAddModal.value = true;
       if (type === "edit" && selectedSection.value) showEditModal.value = true;
@@ -145,26 +154,6 @@ export default {
       selectedSection.value = section;
     };
 
-    const addSection = (section) => {
-      sections.value.push(section);
-      displayToast("Section added successfully");
-    };
-
-    const editSection = (updatedSection) => {
-      const index = sections.value.findIndex((s) => s[0] === updatedSection[0]);
-      if (index !== -1) {
-        sections.value[index] = updatedSection;
-        selectedSection.value = updatedSection;
-        displayToast("Section updated successfully");
-      }
-    };
-
-    const deleteSection = (sectionId) => {
-      sections.value = sections.value.filter((s) => s[0] !== sectionId);
-      selectedSection.value = null;
-      displayToast("Section deleted successfully");
-    };
-
     const displayToast = (message) => {
       toastMessage.value = message;
       const toast = new bootstrap.Toast(document.querySelector(".toast"));
@@ -179,13 +168,7 @@ export default {
     };
 
     onMounted(() => {
-      // Fetch sections data from API or store
-      // For now, we'll use dummy data
-      sections.value = [
-        [1, "Section 1", "Description 1"],
-        [2, "Section 2", "Description 2"],
-        [3, "Section 3", "Description 3"],
-      ];
+      fetchSections();
     });
 
     return {
@@ -198,9 +181,7 @@ export default {
       showModal,
       closeModal,
       selectSection,
-      addSection,
-      editSection,
-      deleteSection,
+      fetchSections,
       displayToast,
       closeToast,
     };

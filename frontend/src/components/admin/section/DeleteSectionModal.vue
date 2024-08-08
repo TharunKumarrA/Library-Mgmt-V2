@@ -51,6 +51,7 @@
 </template>
 
 <script>
+import axios from "axios";
 import { ref } from "vue";
 
 export default {
@@ -66,9 +67,16 @@ export default {
     const sectionId = ref(props.section[0]);
     const sectionName = ref(props.section[1]);
 
-    const submitForm = () => {
-      emit("delete-section", sectionId.value);
-      emit("close");
+    const submitForm = async () => {
+      try {
+        await axios.delete("/manage/sections", {
+          data: { id: sectionId.value },
+        });
+        emit("delete-section", sectionId.value);
+        emit("close");
+      } catch (error) {
+        console.error("Error deleting section:", error);
+      }
     };
 
     return {

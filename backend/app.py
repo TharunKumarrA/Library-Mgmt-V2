@@ -14,7 +14,7 @@ app.config['UPLOAD_FOLDER'] = uploadPath
 
 app.secret_key = secret_key
 
-CORS(app)
+CORS(app, resources={r"/api/*": {"origins": "*"}}) 
 app.register_blueprint(ep)
 
 if __name__ == '__main__':

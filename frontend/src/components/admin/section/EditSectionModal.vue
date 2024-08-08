@@ -69,6 +69,7 @@
 
 <script>
 import { ref } from "vue";
+import axios from "axios";
 
 export default {
   name: "EditSectionModal",
@@ -84,13 +85,22 @@ export default {
     const sectionName = ref(props.section[1]);
     const sectionDesc = ref(props.section[2]);
 
-    const submitForm = () => {
-      emit("edit-section", [
-        sectionId.value,
-        sectionName.value,
-        sectionDesc.value,
-      ]);
-      emit("close");
+    const submitForm = async () => {
+      try {
+        await axios.put("/manage/sections", {
+          id: sectionId.value,
+          name: sectionName.value,
+          desc: sectionDesc.value,
+        });
+        emit("edit-section", [
+          sectionId.value,
+          sectionName.value,
+          sectionDesc.value,
+        ]);
+        emit("close");
+      } catch (error) {
+        console.error("Error editing section:", error);
+      }
     };
 
     return {
