@@ -111,41 +111,40 @@ export default {
   },
   methods: {
     async searchBooks() {
-      this.loading = true;
-      this.error = null;
-      this.searched = false;
-      this.books = [];
+  this.loading = true;
+  this.error = null;
+  this.searched = false;
+  this.books = [];
 
-      try {
-        // Replace this with your actual API call
-        const response = await fetch('/api/search', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(this.searchForm),
-        });
+  try {
+    const response = await fetch('/api/search', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(this.searchForm),
+    });
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
 
-        const data = await response.json();
+    const data = await response.json();
 
-        if (Array.isArray(data)) {
-          this.books = data;
-        } else {
-          throw new Error('Invalid data format received from server');
-        }
+    if (Array.isArray(data.books)) {
+      this.books = data.books;
+    } else {
+      throw new Error('Invalid data format received from server');
+    }
 
-        this.searched = true;
-      } catch (err) {
-        console.error('Search error:', err);
-        this.error = 'An error occurred while searching. Please try again.';
-      } finally {
-        this.loading = false;
-      }
-    },
+    this.searched = true;
+  } catch (err) {
+    console.error('Search error:', err);
+    this.error = 'An error occurred while searching. Please try again.';
+  } finally {
+    this.loading = false;
+  }
+},
     requestBook(bookId) {
       // Implement book request functionality
       console.log(`Requesting book with ID: ${bookId}`);
