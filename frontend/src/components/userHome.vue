@@ -53,12 +53,12 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="book in borrowedBooks" :key="book[0]">
-                  <td>{{ book[0] }}</td>
-                  <td>{{ book[1] }}</td>
-                  <td>{{ book[2] }}</td>
+                <tr v-for="book in borrowedBooks" :key="book.id">
+                  <td>{{ book.id }}</td>
+                  <td>{{ book.title }}</td>
+                  <td>{{ book.author }}</td>
                   <td class="d-flex">
-                    <form @submit.prevent="readBook(book[1])" class="me-2">
+                    <form @submit.prevent="readBook(book.title)" class="me-2">
                       <input
                         type="submit"
                         class="btn btn-primary btn-sm"
@@ -67,7 +67,7 @@
                     </form>
                     <button
                       class="btn btn-danger btn-sm"
-                      @click="revokeBook(book[0])"
+                      @click="revokeBook(book.id)"
                     >
                       Revoke
                     </button>
@@ -87,49 +87,43 @@ import { ref, onMounted } from "vue";
 import axios from "../routers/axios.js"; // Adjust the import path if necessary
 
 export default {
-  name: "YourComponent",
+  name: "LibraryDashboard",
   setup() {
     const username = ref("");
+    const isAdmin = ref(false);
     const borrowedBooks = ref([]);
 
-    const checkSession = async () => {
+    onMounted(async () => {
+      // Retrieve username and isAdmin from localStorage
+      username.value = localStorage.getItem("username") || "";
+      isAdmin.value = localStorage.getItem("isAdmin") === "true";
+
+      // Fetch borrowed books from the API
       try {
-        const response = await axios.get("/check_session");
-        if (response.status === 200) {
-          const { sessionId, username: user, isAdmin } = response.data;
-          localStorage.setItem("sessionId", sessionId);
-          localStorage.setItem("username", user);
-          localStorage.setItem("isAdmin", isAdmin);
-          username.value = user;
-          console.log("Session is active");
-        }
+        const response = await axios.get("/books/borrowed/<string:username>", {
+          params: { username: username.value },
+        });
+        borrowedBooks.value = response.data.books;
       } catch (error) {
-        if (error.response && error.response.status === 401) {
-          // Not logged in, redirect to login page
-          window.location.href = "/login"; // Use window.location.href for navigation
-        } else {
-          console.error("Error checking session:", error);
-        }
+        console.error("Failed to fetch borrowed books:", error);
       }
+    });
+
+    const readBook = (title) => {
+      console.log(`Reading book: ${title}`);
     };
 
-    onMounted(() => {
-      checkSession();
-    });
+    const revokeBook = (bookId) => {
+      console.log(`Revoking book with ID: ${bookId}`);
+    };
 
     return {
       username,
+      isAdmin,
       borrowedBooks,
-      checkSession,
+      readBook,
+      revokeBook,
     };
-  },
-  methods: {
-    readBook(title) {
-      console.log(`Reading book: ${title}`);
-    },
-    revokeBook(bookId) {
-      console.log(`Revoking book with ID: ${bookId}`);
-    },
   },
 };
 </script>

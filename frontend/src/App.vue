@@ -7,15 +7,12 @@
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item">
               <router-link
-                v-if="currentRoute == '/admin' || isAdmin"
+                v-if="currentRoute == '/admin' || userState.isAdmin"
                 class="nav-link"
                 to="/admin"
                 >Home</router-link
               >
-
-              <router-link v-else class="nav-link" to="/"
-                >Home</router-link
-              >
+              <router-link v-else class="nav-link" to="/">Home</router-link>
             </li>
             <li class="nav-item">
               <router-link class="nav-link" to="/books">Books</router-link>
@@ -23,23 +20,17 @@
             <li class="nav-item">
               <router-link class="nav-link" to="/search">Search</router-link>
             </li>
-            <li
-              class="nav-item"
-              v-if="currentRoute !== '/login' && currentRoute !== '/signup'"
-            >
+            <li class="nav-item" v-if="userState.isLoggedIn">
               <router-link class="nav-link" to="/profile">Profile</router-link>
             </li>
-            <li
-              class="nav-item"
-              v-if="currentRoute !== '/login' && currentRoute !== '/signup'"
-            >
+            <li class="nav-item" v-if="userState.isLoggedIn">
               <router-link class="nav-link" to="/logout">Log out</router-link>
             </li>
-            <li class="nav-item" v-if="currentRoute === '/login'">
-              <router-link class="nav-link" to="/signup">Sign Up</router-link>
-            </li>
-            <li class="nav-item" v-if="currentRoute === '/signup'">
+            <li class="nav-item" v-if="!userState.isLoggedIn">
               <router-link class="nav-link" to="/login">Login</router-link>
+            </li>
+            <li class="nav-item" v-if="!userState.isLoggedIn">
+              <router-link class="nav-link" to="/signup">Sign Up</router-link>
             </li>
           </ul>
         </div>
@@ -50,21 +41,53 @@
 </template>
 
 <script>
+import { inject, onMounted, watch } from "vue";
+import { useRoute } from "vue-router";
+
 export default {
   name: "App",
-  data() {
-    return {
-      currentRoute: this.$route.path,
-      isAdmin: false,
+  setup() {
+    const userState = inject("userState");
+    const route = useRoute();
+
+    const checkSession = () => {
+      const sessionId = localStorage.getItem("sessionId");
+      const username = localStorage.getItem("username");
+      const isAdmin = localStorage.getItem("isAdmin");
+
+      if (sessionId && username) {
+        userState.isLoggedIn = true;
+        userState.isAdmin = isAdmin === "true";
+        userState.username = username;
+      } else {
+        userState.isLoggedIn = false;
+        userState.isAdmin = false;
+        userState.username = "";
+      }
     };
-  },
-  watch: {
-    $route(to) {
-      this.currentRoute = to.path;
-    },
-  },
-  created() {
-    this.currentRoute = this.$route.path;
+
+    onMounted(() => {
+      checkSession();
+    });
+
+    watch(
+      () => route.path,
+      (newPath) => {
+        if (
+          !userState.isLoggedIn &&
+          newPath !== "/login" &&
+          newPath !== "/signup"
+        ) {
+          // Redirect to login if no valid session
+          route.push("/login");
+        }
+      }
+    );
+
+    return {
+      userState,
+      currentRoute: route.path,
+    };
   },
 };
 </script>

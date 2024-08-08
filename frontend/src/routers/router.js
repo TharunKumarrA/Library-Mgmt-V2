@@ -11,6 +11,7 @@ import ManageRequests from "../components/admin/ManageRequests.vue";
 import Profile from "../components/Profile.vue";
 import Books from "../components/Books.vue";
 import Search from "../components/Search.vue";
+import Logout from "../components/Logout.vue";
 
 const routes = [
   {
@@ -67,6 +68,11 @@ const routes = [
     path: "/search",
     name: "search",
     component: Search,
+  },
+  {
+    path: "/logout",
+    name: "logout",
+    component: Logout,
   },
   // Add more routes here
 ];

@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, session, Blueprint, abort, url_for, redirect, jsonify
-import sqlite3
+import sqlite3, uuid
+
 
 database = 'database.db'
 
@@ -21,22 +22,6 @@ create_tables()
 
 ep = Blueprint('endpoints', __name__)
 
-@ep.route('/api/check_session', methods=['GET'])
-def check_session():
-    try:
-        if 'username' in session:
-            return jsonify({
-                'sessionId': session.get('sessionId'),
-                'username': session.get('username'),
-                'isAdmin': session.get('isAdmin')
-            }), 200
-        else:
-            abort(401)  # Unauthorized
-    except Exception as e:
-        print(f"An error occurred: {e}")
-        abort(500)  # Internal server error
-
-
 @ep.route('/api/login', methods=['POST'])
 def login():
     try:
@@ -56,16 +41,33 @@ def login():
 
         if user:
             isadmin = user[5]
-            if isadmin is None:
+            if isadmin == "0" or isadmin == 0:
                 isadmin = False
-            else:
+            if isadmin == "1" or isadmin == 1:
                 isadmin = True
-            return jsonify({'message': 'Login successful', 'isAdmin': isadmin}), 200
+            
+            # Create a session
+            session_id = str(uuid.uuid4())
+            session['username'] = username
+            session['sessionId'] = session_id
+            session['isAdmin'] = isadmin
+
+            return jsonify({
+                'message': 'Login successful',
+                'sessionId': session_id,
+                'username': username,
+                'isAdmin': isadmin
+            }), 200
         else:
             return jsonify({'message': 'Invalid Credentials'}), 401  # Unauthorized
     except Exception as e:
         print(f"An error occurred during login: {e}")
         abort(500)  # Internal server error
+
+@ep.route('/api/logout', methods=['POST'])
+def logout():
+    session.clear()
+    return jsonify({'message': 'Logout successful'}), 200
 
 
 @ep.route('/api/register', methods=['POST'])

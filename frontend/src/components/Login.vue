@@ -87,13 +87,36 @@ export default {
 
       try {
         const response = await axios.post(apiUrl, requestData);
-
         console.log("Response status:", response.status);
         console.log("Response data:", response.data);
 
         if (response.status === 200) {
+          // Store session details in localStorage
+          localStorage.setItem("sessionId", response.data.sessionId);
+          localStorage.setItem("username", response.data.username);
+          localStorage.setItem("isAdmin", response.data.isAdmin);
+
+          // Update userState (assuming userState is available via inject)
+          const userState = this.$root.userState;
+          userState.isLoggedIn = true;
+          userState.isAdmin = response.data.isAdmin;
+          userState.username = response.data.username;
+
+          // Console logs to verify localStorage contents
+          console.log("Login successful...");
+          console.log("sessionId:", localStorage.getItem("sessionId"));
+
           this.toastMessage = "Login successful!";
-          this.$router.push("/"); // Redirect to a different page after successful login
+
+          // Delay redirect to allow toast to be shown
+          setTimeout(() => {
+            const isAdmin = localStorage.getItem("isAdmin") === "true";
+            if (isAdmin) {
+              this.$router.push("/admin");
+            } else {
+              this.$router.push("/");
+            }
+          }, 1000); // Adjust delay as needed
         }
       } catch (error) {
         console.error("Error occurred:", error);
