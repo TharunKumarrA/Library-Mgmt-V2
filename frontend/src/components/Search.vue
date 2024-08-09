@@ -39,9 +39,13 @@
                   />
                 </div>
                 <div class="d-grid">
-                  <button type="submit" class="btn btn-primary" :disabled="loading">
+                  <button
+                    type="submit"
+                    class="btn btn-primary"
+                    :disabled="loading"
+                  >
                     <i class="bi bi-search me-2"></i>
-                    {{ loading ? 'Searching...' : 'Search' }}
+                    {{ loading ? "Searching..." : "Search" }}
                   </button>
                 </div>
               </form>
@@ -66,7 +70,7 @@
                     <tr>
                       <th>Title</th>
                       <th>Author</th>
-                      <th>Section ID</th>
+                      <th>Section</th>
                       <th>Actions</th>
                     </tr>
                   </thead>
@@ -76,7 +80,10 @@
                       <td>{{ book[2] }}</td>
                       <td>{{ book[3] }}</td>
                       <td>
-                        <button class="btn btn-sm btn-primary" @click="requestBook(book[0])">
+                        <button
+                          class="btn btn-sm btn-primary"
+                          @click="requestBook(book[0])"
+                        >
                           Request
                         </button>
                       </td>
@@ -84,7 +91,9 @@
                   </tbody>
                 </table>
               </div>
-              <p v-else-if="searched && !loading" class="text-muted">No books found.</p>
+              <p v-else-if="searched && !loading" class="text-muted">
+                No books found.
+              </p>
             </div>
           </div>
         </div>
@@ -94,63 +103,53 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
-  name: 'SearchBooks',
+  name: "SearchBooks",
   data() {
     return {
       searchForm: {
-        title: '',
-        author: '',
-        section: ''
+        title: "",
+        author: "",
+        section: "",
       },
       books: [],
       searched: false,
       loading: false,
-      error: null
-    }
+      error: null,
+    };
   },
   methods: {
     async searchBooks() {
-  this.loading = true;
-  this.error = null;
-  this.searched = false;
-  this.books = [];
+      this.loading = true;
+      this.error = null;
+      this.searched = false;
+      this.books = [];
 
-  try {
-    const response = await fetch('/api/search', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(this.searchForm),
-    });
+      try {
+        const response = await axios.post("/search", this.searchForm);
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
+        if (Array.isArray(response.data.books)) {
+          this.books = response.data.books;
+        } else {
+          throw new Error("Invalid data format received from server");
+        }
 
-    const data = await response.json();
-
-    if (Array.isArray(data.books)) {
-      this.books = data.books;
-    } else {
-      throw new Error('Invalid data format received from server');
-    }
-
-    this.searched = true;
-  } catch (err) {
-    console.error('Search error:', err);
-    this.error = 'An error occurred while searching. Please try again.';
-  } finally {
-    this.loading = false;
-  }
-},
+        this.searched = true;
+      } catch (err) {
+        console.error("Search error:", err);
+        this.error = "An error occurred while searching. Please try again.";
+      } finally {
+        this.loading = false;
+      }
+    },
     requestBook(bookId) {
-      // Implement book request functionality
       console.log(`Requesting book with ID: ${bookId}`);
-    }
-  }
-}
+      // Implement the book request functionality
+    },
+  },
+};
 </script>
 
 <style scoped>
