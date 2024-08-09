@@ -115,6 +115,7 @@
 
 <script>
 import { Modal, Toast } from "bootstrap";
+import axios from "axios"; // Import Axios
 
 export default {
   name: "AllBooks",
@@ -137,12 +138,15 @@ export default {
   },
   methods: {
     fetchBooks() {
-      // Implement API call to fetch books
-      // This is a placeholder, replace with actual API call
-      this.books = [
-        [1, "Book 1", "Author 1", "Other info", "Other info", 5],
-        [2, "Book 2", "Author 2", "Other info", "Other info", 3],
-      ];
+      // Make a GET request to fetch books
+      axios
+        .get("/books")
+        .then((response) => {
+          this.books = response.data; // Set the books data
+        })
+        .catch((error) => {
+          console.error("There was an error fetching the books!", error);
+        });
     },
     openRequestModal(bookId) {
       this.selectedBook = this.books.find((book) => book[0] === bookId);
@@ -163,11 +167,16 @@ export default {
 
       console.log("Request Form Data:", requestData);
 
-      // Implement API call to submit request
-      // This is a placeholder, replace with actual API call
-      // After successful API call:
-      this.displayToast("Book requested successfully");
-      this.closeModal();
+      // Make a POST request to submit the book request
+      axios
+        .post("/books/request", requestData)
+        .then(() => {
+          this.displayToast("Book requested successfully");
+          this.closeModal();
+        })
+        .catch((error) => {
+          console.error("There was an error submitting the request!", error);
+        });
     },
     calculateTillDate() {
       const date = new Date();
