@@ -77,12 +77,13 @@
 
 <script>
 import { Toast } from "bootstrap";
+import axios from "axios";
 
 export default {
   name: "Profile",
   data() {
     return {
-      username: "",
+      username: localStorage.getItem("username"),
       name: "",
       email: "",
       bio: "",
@@ -96,24 +97,42 @@ export default {
   },
   methods: {
     fetchProfileData() {
-      // Implement API call to fetch profile data
-      // This is a placeholder, replace with actual API call
-      this.username = "user123";
-      this.name = "John Doe";
-      this.email = "john@example.com";
-      this.bio = "A short bio";
+      axios
+        .post("/profile", {
+          username: this.username,
+        })
+        .then((response) => {
+          const userData = response.data;
+          this.username = userData[0];
+          this.name = userData[1];
+          this.email = userData[3];
+          this.bio = userData[4];
+        })
+        .catch((error) => {
+          console.error("There was an error fetching the profile data!", error);
+        });
     },
     saveProfile() {
-      // Implement API call to save profile data
-      // This is a placeholder, replace with actual API call
-      console.log("Profile data:", {
+      // Save profile data using Axios with username in request body
+      const profileData = {
+        username: this.username,
         name: this.name,
         email: this.email,
         bio: this.bio,
-      });
+      };
 
-      // Simulate successful save
-      this.displayToast("Profile updated successfully");
+      axios
+        .post("/profile/update", profileData, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+        .then(() => {
+          this.displayToast("Profile updated successfully");
+        })
+        .catch((error) => {
+          console.error("There was an error saving the profile data!", error);
+        });
     },
     displayToast(message) {
       this.toastMessage = message;
