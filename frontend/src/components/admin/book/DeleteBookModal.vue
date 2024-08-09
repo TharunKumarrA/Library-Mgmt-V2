@@ -71,7 +71,7 @@ export default {
     });
 
     const submitForm = () => {
-      emit("delete-book", deleteBookId.value);
+      emit("delete-book", parseInt(deleteBookId.value));
       emit("close");
     };
 

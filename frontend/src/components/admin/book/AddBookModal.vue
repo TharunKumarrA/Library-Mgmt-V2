@@ -131,14 +131,13 @@ export default {
     };
 
     const submitForm = () => {
-      const newBook = [
-        Date.now(), // Temporary ID
-        bookTitle.value,
-        bookAuthor.value,
-        bookSection.value,
-        bookDesc.value,
-        bookCopies.value,
-      ];
+      const newBook = {
+        title: bookTitle.value,
+        author: bookAuthor.value,
+        section_id: parseInt(bookSection.value),
+        desc: bookDesc.value,
+        copies: parseInt(bookCopies.value),
+      };
       emit("add-book", newBook);
       emit("close");
     };

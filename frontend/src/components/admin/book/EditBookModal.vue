@@ -134,14 +134,14 @@ export default {
     });
 
     const submitForm = () => {
-      const updatedBook = [
-        editBookId.value,
-        editBookTitle.value,
-        editBookAuthor.value,
-        editBookSection.value,
-        editBookDesc.value,
-        editBookCopies.value,
-      ];
+      const updatedBook = {
+        id: parseInt(editBookId.value),
+        title: editBookTitle.value,
+        author: editBookAuthor.value,
+        section_id: parseInt(editBookSection.value),
+        desc: editBookDesc.value,
+        copies: parseInt(editBookCopies.value),
+      };
       emit("edit-book", updatedBook);
       emit("close");
     };

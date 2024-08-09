@@ -94,20 +94,18 @@
 
     <!-- Toast message -->
     <div
-      class="toast align-items-center text-white bg-primary border-0 position-fixed bottom-0 start-50 translate-middle-x mb-4"
-      role="alert"
-      aria-live="assertive"
-      aria-atomic="true"
-      ref="toast"
+      v-if="showToast"
+      class="toast-container position-fixed bottom-0 start-50 translate-middle-x p-3"
     >
-      <div class="d-flex">
-        <div class="toast-body">{{ toastMessage }}</div>
-        <button
-          type="button"
-          class="btn-close btn-close-white me-2 m-auto"
-          @click="closeToast"
-          aria-label="Close"
-        ></button>
+      <div
+        class="toast show text-light bg-primary"
+        role="alert"
+        aria-live="polite"
+        aria-atomic="true"
+      >
+        <div class="toast-body">
+          {{ toastMessage }}
+        </div>
       </div>
     </div>
   </div>
@@ -115,6 +113,7 @@
 
 <script>
 import { ref, onMounted } from "vue";
+import axios from "axios";
 import AddBookModal from "./book/AddBookModal.vue";
 import EditBookModal from "./book/EditBookModal.vue";
 import DeleteBookModal from "./book/DeleteBookModal.vue";
@@ -134,6 +133,32 @@ export default {
     const showEditModal = ref(false);
     const showDeleteModal = ref(false);
     const toastMessage = ref("");
+    const showToast = ref(false);
+
+    const fetchBooks = async () => {
+      try {
+        const response = await axios.get("/books");
+        books.value = response.data;
+      } catch (error) {
+        console.error("Error fetching books:", error);
+        displayToast("Error fetching books");
+      }
+    };
+
+    const fetchSections = async () => {
+      try {
+        const response = await axios.get("/sections");
+        sections.value = response.data;
+      } catch (error) {
+        console.error("Error fetching sections:", error);
+        displayToast("Error fetching sections");
+      }
+    };
+
+    onMounted(async () => {
+      await fetchBooks();
+      await fetchSections();
+    });
 
     const showModal = (type) => {
       if (type === "add") showAddModal.value = true;
@@ -151,52 +176,48 @@ export default {
       selectedBook.value = book;
     };
 
-    const addBook = (book) => {
-      books.value.push(book);
-      displayToast("Book added successfully");
-    };
-
-    const editBook = (updatedBook) => {
-      const index = books.value.findIndex((b) => b[0] === updatedBook[0]);
-      if (index !== -1) {
-        books.value[index] = updatedBook;
-        selectedBook.value = updatedBook;
-        displayToast("Book updated successfully");
+    const addBook = async (book) => {
+      try {
+        await axios.post("/manage/books", book);
+        await fetchBooks();
+        displayToast("Book added successfully");
+      } catch (error) {
+        console.error("Error adding book:", error);
+        displayToast("Error adding book");
       }
     };
 
-    const deleteBook = (bookId) => {
-      books.value = books.value.filter((b) => b[0] !== bookId);
-      selectedBook.value = null;
-      displayToast("Book deleted successfully");
+    const editBook = async (updatedBook) => {
+      try {
+        await axios.put("/manage/books", updatedBook);
+        await fetchBooks();
+        selectedBook.value = updatedBook;
+        displayToast("Book updated successfully");
+      } catch (error) {
+        console.error("Error updating book:", error);
+        displayToast("Error updating book");
+      }
+    };
+
+    const deleteBook = async (bookId) => {
+      try {
+        await axios.delete("/manage/books", { data: { id: bookId } });
+        await fetchBooks();
+        selectedBook.value = null;
+        displayToast("Book deleted successfully");
+      } catch (error) {
+        console.error("Error deleting book:", error);
+        displayToast("Error deleting book");
+      }
     };
 
     const displayToast = (message) => {
       toastMessage.value = message;
-      const toast = new bootstrap.Toast(document.querySelector(".toast"));
-      toast.show();
+      showToast.value = true;
+      setTimeout(() => {
+        showToast.value = false;
+      }, 3000);
     };
-
-    const closeToast = () => {
-      const toast = bootstrap.Toast.getInstance(
-        document.querySelector(".toast")
-      );
-      toast.hide();
-    };
-
-    onMounted(() => {
-      // Fetch books and sections data from API or store
-      // For now, we'll use dummy data
-      books.value = [
-        [1, "Book 1", "Author 1", 1, "Description 1", 5],
-        [2, "Book 2", "Author 2", 2, "Description 2", 3],
-        [3, "Book 3", "Author 3", 1, "Description 3", 7],
-      ];
-      sections.value = [
-        [1, "Section 1"],
-        [2, "Section 2"],
-      ];
-    });
 
     return {
       books,
@@ -206,14 +227,13 @@ export default {
       showEditModal,
       showDeleteModal,
       toastMessage,
+      showToast,
       showModal,
       closeModal,
       selectBook,
       addBook,
       editBook,
       deleteBook,
-      displayToast,
-      closeToast,
     };
   },
 };
