@@ -8,7 +8,7 @@
             <th>Title</th>
             <th>Author</th>
             <th>Copies Available</th>
-            <th>Actions</th>
+            <th v-if="!isAdmin">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -16,7 +16,7 @@
             <td>{{ book[1] }}</td>
             <td>{{ book[2] }}</td>
             <td>{{ book[5] }}</td>
-            <td>
+            <td v-if="!isAdmin">
               <button
                 class="btn btn-primary btn-sm"
                 @click="openRequestModal(book[0])"
@@ -115,7 +115,7 @@
 
 <script>
 import { Modal, Toast } from "bootstrap";
-import axios from "axios"; // Import Axios
+import axios from "axios";
 
 export default {
   name: "AllBooks",
@@ -128,6 +128,7 @@ export default {
       toastMessage: "",
       modal: null,
       toast: null,
+      isAdmin: false,
     };
   },
   mounted() {
@@ -135,49 +136,58 @@ export default {
     this.modal = new Modal(this.$refs.modal);
     this.toast = new Toast(this.$refs.toast);
     this.calculateTillDate();
+    this.checkAdminStatus();
   },
   methods: {
     fetchBooks() {
-      // Make a GET request to fetch books
       axios
-        .get("/books")
+        .get("/books") // Update the URL to match your backend endpoint
         .then((response) => {
-          this.books = response.data; // Set the books data
+          this.books = response.data;
         })
         .catch((error) => {
           console.error("There was an error fetching the books!", error);
         });
     },
     openRequestModal(bookId) {
+      console.log("Opening modal for book ID:", bookId);
       this.selectedBook = this.books.find((book) => book[0] === bookId);
-      this.modal.show();
+      if (this.selectedBook) {
+        this.modal.show();
+      }
     },
     closeModal() {
       this.modal.hide();
     },
     submitRequest() {
-      if (!this.selectedBook) return;
+      if (!this.selectedBook) {
+        console.error("No book selected");
+        return;
+      }
+
+      console.log("Submitting request for book:", this.selectedBook);
 
       const requestData = {
-        action: "request",
+        username: localStorage.getItem("username"), // assuming you store the username in localStorage
         book_id: this.selectedBook[0],
-        current_date: this.currentDate,
-        till_date: this.tillDate,
+        start_date: this.currentDate,
+        end_date: this.tillDate,
       };
-
-      console.log("Request Form Data:", requestData);
 
       // Make a POST request to submit the book request
       axios
         .post("/books/request", requestData)
-        .then(() => {
+        .then((response) => {
           this.displayToast("Book requested successfully");
           this.closeModal();
+          this.fetchBooks(); // Refresh book data to update available copies
         })
         .catch((error) => {
           console.error("There was an error submitting the request!", error);
+          this.displayToast("Failed to request the book");
         });
     },
+
     calculateTillDate() {
       const date = new Date();
       date.setDate(date.getDate() + 14); // 14 days from now
@@ -189,6 +199,9 @@ export default {
     },
     hideToast() {
       this.toast.hide();
+    },
+    checkAdminStatus() {
+      this.isAdmin = localStorage.getItem("isAdmin") === "true";
     },
   },
 };

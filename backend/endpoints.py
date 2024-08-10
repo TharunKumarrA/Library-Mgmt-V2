@@ -495,7 +495,7 @@ def book_request():
         if not data or 'username' not in data or 'book_id' not in data or 'end_date' not in data or 'start_date' not in data:
             abort(400)
 
-        username = data.get('username')
+        username = data.get('username') 
         book_id = data.get('book_id')
         start_date = data.get('start_date')
         end_date = data.get('end_date')

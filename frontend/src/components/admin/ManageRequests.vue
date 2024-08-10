@@ -45,6 +45,8 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   name: "BookRequests",
   data() {
@@ -56,51 +58,37 @@ export default {
     this.fetchRequests();
   },
   methods: {
-    fetchRequests() {
-      // Implement API call to fetch book requests
-      // This is a placeholder, replace with actual API call
-      this.requests = [
-        [
-          1,
-          "user1",
-          "book1",
-          "2023-05-01",
-          "2023-05-15",
-          0,
-          "Book Title 1",
-          "Author 1",
-        ],
-        [
-          2,
-          "user2",
-          "book2",
-          "2023-05-02",
-          "2023-05-16",
-          1,
-          "Book Title 2",
-          "Author 2",
-        ],
-      ];
+    async fetchRequests() {
+      try {
+        const response = await axios.get("/requests");
+        this.requests = response.data;
+      } catch (error) {
+        console.error("Error fetching requests:", error);
+      }
     },
-    issueBook(request) {
-      console.log("Issue Book Form Data:", {
-        username: request[1],
-        request_id: request[0],
-        action: "ISSUE",
-      });
-      // Implement API call to issue book
-      // This is a placeholder, replace with actual API call
-      // After successful API call, update the requests data
+    async issueBook(request) {
+      try {
+        const response = await axios.post("/issue", {
+          request_id: request[0],
+        });
+        if (response.status === 200) {
+          this.fetchRequests(); // Refresh the list after issuing the book
+        }
+      } catch (error) {
+        console.error("Error issuing book:", error);
+      }
     },
-    revokeBook(request) {
-      console.log("Revoke Book Form Data:", {
-        username: request[1],
-        book_id: request[2],
-        action: "REVOKE",
-      });
-      // Implement API call to revoke book
-      // This is a placeholder, replace with actual API call
-      // After successful API call, update the requests data
+    async revokeBook(request) {
+      try {
+        const response = await axios.post(
+          `/revoke/${request[1]}/${request[2]}`
+        );
+        if (response.status === 200) {
+          this.fetchRequests(); // Refresh the list after revoking the book
+        }
+      } catch (error) {
+        console.error("Error revoking book:", error);
+      }
     },
   },
 };
