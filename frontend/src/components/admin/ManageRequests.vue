@@ -25,7 +25,6 @@
             <form v-if="request[5] === 0" @submit.prevent="issueBook(request)">
               <input type="hidden" name="username" :value="request[1]" />
               <input type="hidden" name="request_id" :value="request[0]" />
-              <input type="hidden" name="action" value="ISSUE" />
               <button type="submit" class="btn btn-success">Issue Book</button>
             </form>
             <form
@@ -34,7 +33,6 @@
             >
               <input type="hidden" name="username" :value="request[1]" />
               <input type="hidden" name="book_id" :value="request[2]" />
-              <input type="hidden" name="action" value="REVOKE" />
               <button type="submit" class="btn btn-danger">Revoke Book</button>
             </form>
           </td>

@@ -100,10 +100,13 @@ export default {
 
       // Fetch borrowed books from the API
       try {
-        const response = await axios.get("/books/borrowed/<string:username>", {
-          params: { username: username.value },
-        });
-        borrowedBooks.value = response.data.books;
+        const response = await axios.get(`/books/borrowed/${username.value}`);
+        console.log("API Response:", response.data);
+        borrowedBooks.value = response.data.map((book) => ({
+          id: book[0],
+          title: book[1],
+          author: book[2],
+        }));
       } catch (error) {
         console.error("Failed to fetch borrowed books:", error);
       }
