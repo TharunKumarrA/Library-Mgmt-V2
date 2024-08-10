@@ -42,27 +42,35 @@
 
 <script>
 import { inject, onMounted, watch } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 
 export default {
   name: "App",
   setup() {
-    const userState = inject("userState");
+    const userState = inject("userState") || {
+      isLoggedIn: false,
+      isAdmin: false,
+      username: "",
+    };
     const route = useRoute();
+    const router = useRouter(); // Use useRouter to get the router instance
 
     const checkSession = () => {
       const sessionId = localStorage.getItem("sessionId");
       const username = localStorage.getItem("username");
       const isAdmin = localStorage.getItem("isAdmin");
 
-      if (sessionId && username) {
+      if (
+        !sessionId ||
+        sessionId === "undefined" ||
+        sessionId === "null" ||
+        sessionId === ""
+      ) {
+        router.push("/login"); // Use router.push for navigation
+      } else {
         userState.isLoggedIn = true;
         userState.isAdmin = isAdmin === "true";
         userState.username = username;
-      } else {
-        userState.isLoggedIn = false;
-        userState.isAdmin = false;
-        userState.username = "";
       }
     };
 
@@ -78,8 +86,7 @@ export default {
           newPath !== "/login" &&
           newPath !== "/signup"
         ) {
-          // Redirect to login if no valid session
-          route.push("/login");
+          router.push("/login"); // Use router.push for navigation
         }
       }
     );
