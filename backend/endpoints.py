@@ -1,6 +1,7 @@
-from flask import Flask, render_template, request, session, Blueprint, abort, url_for, redirect, jsonify
-import sqlite3, uuid
-
+from flask import Flask, render_template, request, session, Blueprint, abort, url_for, redirect, jsonify, current_app, send_from_directory
+import sqlite3, uuid, os
+from werkzeug.utils import secure_filename
+from urllib.parse import unquote
 
 database = 'database.db'
 
@@ -267,19 +268,30 @@ def manage_books():
         conn = sqlite3.connect(database)
         cursor = conn.cursor()
 
-        data = request.json
-        if not data:
-            abort(400)
-
         if request.method == 'POST':
-            if not data or 'title' not in data or 'author' not in data or 'section_id' not in data or 'desc' not in data or 'copies' not in data:
-                abort(400)
-            title = data.get('title')
-            author = data.get('author')
-            section_id = data.get('section_id')
-            desc = data.get('desc')
-            copies = data.get('copies')
-            cursor.execute('INSERT INTO books (title, author, section_id, description, copies) VALUES (?, ?, ?, ?, ?)', (title, author, section_id, desc, copies))
+            if 'file' not in request.files:
+                abort(400, description="No file part")
+            
+            file = request.files['file']
+            if file.filename == '':
+                abort(400, description="No selected file")
+            
+            if file:
+                filename = secure_filename(file.filename)
+                file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+                file.save(file_path)
+
+            title = request.form.get('title')
+            author = request.form.get('author')
+            section_id = request.form.get('section_id')
+            desc = request.form.get('desc')
+            copies = request.form.get('copies')
+
+            if not all([title, author, section_id, desc, copies]):
+                abort(400, description="Missing required fields")
+
+            cursor.execute('INSERT INTO books (title, author, section_id, description, copies) VALUES (?, ?, ?, ?, ?)', 
+                           (title, author, section_id, desc, copies))
             conn.commit()
             cursor.close()
             conn.close()
@@ -287,6 +299,7 @@ def manage_books():
             return 'Book added successfully', 200
 
         elif request.method == 'PUT':
+            data = request.json
             if not data or 'id' not in data:
                 abort(400)
             id = data.get('id')
@@ -296,26 +309,26 @@ def manage_books():
             desc = data.get('desc')
             copies = data.get('copies')
 
-            # Fetch existing book data from the database
             cursor.execute('SELECT * FROM books WHERE id = ?', (id,))
             existing_data = cursor.fetchone()
-            print('existing data: ', existing_data)
             if not existing_data:
                 abort(404)  # Book not found
-            # Update only the fields provided in the request
-            title = existing_data[1] if title == "" else data.get('title')
-            author = existing_data[2] if author == "" else data.get('author')
-            section_id = existing_data[3] if section_id == "" else data.get('section_id')
-            desc = existing_data[4] if desc == "" else data.get('desc')
-            copies = existing_data[5] if copies == "" else data.get('copies')
-            cursor.execute('UPDATE books SET title = ?, author = ?, section_id = ?, description = ?, copies = ? WHERE id = ?', (title, author, section_id, desc, copies, id))
+            
+            title = existing_data[1] if title == "" else title
+            author = existing_data[2] if author == "" else author
+            section_id = existing_data[3] if section_id == "" else section_id
+            desc = existing_data[4] if desc == "" else desc
+            copies = existing_data[5] if copies == "" else copies
+            
+            cursor.execute('UPDATE books SET title = ?, author = ?, section_id = ?, description = ?, copies = ? WHERE id = ?', 
+                           (title, author, section_id, desc, copies, id))
             conn.commit()
             cursor.close()
             conn.close()
             return 'Book updated successfully', 200
 
-
         elif request.method == 'DELETE':
+            data = request.json
             if not data or 'id' not in data:
                 abort(400)
             id = data.get('id')
@@ -544,6 +557,40 @@ def search():
     except Exception as e:
       print("Internal Server Error: ",e)
       abort(500)
+
+@ep.route('/api/<path:path>')
+def catch_all(path):
+    print(f"Caught request for path: {path}")
+    return f"Path not found: {path}", 404
+    
+@ep.route('/api/books/read/<path:filename>')
+def serve_pdf(filename):
+    print(f"Attempting to serve PDF: {filename}")
+
+    # Decode the URL-encoded filename
+    filename = unquote(filename)
+    
+    # Replace spaces with underscores
+    filename = filename.replace(' ', '_')
+    
+    # Replace colon with double underscores
+    filename = filename.replace(':', '__')
+    
+    # Construct the full path
+    full_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename + '.pdf')
+    
+    print(f"Full path: {full_path}")
+    print(f"File exists: {os.path.exists(full_path)}")
+    
+    # List all files in the upload directory
+    print("Files in upload directory:")
+    for file in os.listdir(current_app.config['UPLOAD_FOLDER']):
+        print(file)
+    
+    if os.path.exists(full_path):
+        return send_from_directory(current_app.config['UPLOAD_FOLDER'], filename + '.pdf')
+    else:
+        return f"File not found: {full_path}", 404
 
 
 if __name__ == '__main__':

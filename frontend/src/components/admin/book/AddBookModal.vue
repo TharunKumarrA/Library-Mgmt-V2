@@ -17,7 +17,7 @@
           ></button>
         </div>
         <div class="modal-body">
-          <form @submit.prevent="submitForm">
+          <form @submit.prevent="submitForm" enctype="multipart/form-data">
             <div class="form-group">
               <label for="book">Upload Book</label>
               <input
@@ -105,6 +105,7 @@
 
 <script>
 import { ref } from "vue";
+import axios from "axios";
 
 export default {
   name: "AddBookModal",
@@ -130,16 +131,29 @@ export default {
       }
     };
 
-    const submitForm = () => {
-      const newBook = {
-        title: bookTitle.value,
-        author: bookAuthor.value,
-        section_id: parseInt(bookSection.value),
-        desc: bookDesc.value,
-        copies: parseInt(bookCopies.value),
-      };
-      emit("add-book", newBook);
-      emit("close");
+    const submitForm = async () => {
+      const formData = new FormData();
+      formData.append("file", bookFile.value.files[0]);
+      formData.append("title", bookTitle.value);
+      formData.append("author", bookAuthor.value);
+      formData.append("section_id", bookSection.value);
+      formData.append("desc", bookDesc.value);
+      formData.append("copies", bookCopies.value);
+
+      try {
+        const response = await axios.post("/manage/books", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+        console.log("Server response:", response.data);
+        emit("close");
+        emit("add-book");
+      } catch (error) {
+        console.error("Full error object:", error);
+        console.error("Error response:", error.response);
+        console.error("Error message:", error.message);
+      }
     };
 
     return {

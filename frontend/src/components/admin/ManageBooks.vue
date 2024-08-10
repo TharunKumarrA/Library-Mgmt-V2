@@ -176,15 +176,9 @@ export default {
       selectedBook.value = book;
     };
 
-    const addBook = async (book) => {
-      try {
-        await axios.post("/manage/books", book);
-        await fetchBooks();
-        displayToast("Book added successfully");
-      } catch (error) {
-        console.error("Error adding book:", error);
-        displayToast("Error adding book");
-      }
+    const addBook = async () => {
+      await fetchBooks();
+      displayToast("Book added successfully");
     };
 
     const editBook = async (updatedBook) => {

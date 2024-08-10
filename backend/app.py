@@ -7,10 +7,11 @@ import os
 secret_key = secrets.token_hex(32)
 
 app = Flask(__name__)
-
-abs = os.path.abspath(__file__)
-uploadPath = abs[0:-6]+"uploads"
-app.config['UPLOAD_FOLDER'] = uploadPath
+upload_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'uploads')
+if not os.path.exists(upload_folder):
+    os.makedirs(upload_folder)
+app.config['UPLOAD_FOLDER'] = upload_folder
+print(f"Upload folder: {upload_folder}") 
 
 app.secret_key = secret_key
 

@@ -113,7 +113,11 @@ export default {
     });
 
     const readBook = (title) => {
-      console.log(`Reading book: ${title}`);
+      const pdfUrl = `${axios.defaults.baseURL}/books/read/${encodeURIComponent(
+        title
+      )}`;
+      console.log("Attempting to access:", pdfUrl);
+      window.open(pdfUrl, "_blank");
     };
 
     const revokeBook = (bookId) => {
