@@ -330,12 +330,51 @@ def manage_books():
         elif request.method == 'DELETE':
             data = request.json
             if not data or 'id' not in data:
-                abort(400)
-            id = data.get('id')
-            cursor.execute('DELETE FROM books WHERE id = ?', (id,))
-            conn.commit()
+                return 'Book ID is required', 400
+
+            book_id = data.get('id')
+            print(f"Received book_id: {book_id}")
+
+
+            # Retrieve book title to construct filename
+            cursor.execute('SELECT title FROM books WHERE id = ?', (book_id,))
+            result = cursor.fetchone()
+            print(f"Result: {result}")
+
+            if not result:
+                print(f"Book with ID {book_id} not found in database")
+                conn.close()
+                return 'Book not found', 404
+
+            book_title = result[0]
+            filename = secure_filename(f"{book_title}.pdf")
+            file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+            print(f"File path: {file_path}")
+
+            if not os.path.exists(file_path):
+
+                # Delete book from database
+                cursor.execute('DELETE FROM books WHERE id = ?', (book_id,))
+                conn.commit()
+
+                # Verify deletion from database
+                cursor.execute('SELECT title FROM books WHERE id = ?', (book_id,))
+                still_exists = cursor.fetchone()
+                if still_exists:
+                    print(f"Failed to delete book with ID {book_id}")
+                    conn.close()
+                    return 'Failed to delete book', 500
+
+            # Delete file
+            if os.path.exists(file_path):
+                os.remove(file_path)
+                print(f"File removed: {file_path}")
+            else:
+                print(f"File does not exist: {file_path}")
+
             cursor.close()
             conn.close()
+
             return 'Book deleted successfully', 200
 
     except Exception as e:

@@ -51,6 +51,7 @@
 
 <script>
 import { ref, onMounted } from "vue";
+import axios from "axios";
 
 export default {
   name: "DeleteBookModal",
@@ -70,9 +71,16 @@ export default {
       bookTitle.value = props.book[1];
     });
 
-    const submitForm = () => {
-      emit("delete-book", parseInt(deleteBookId.value));
-      emit("close");
+    const submitForm = async () => {
+      try {
+        await axios.delete("/manage/books", {
+          data: { id: parseInt(deleteBookId.value) }, // Send book ID
+        });
+        emit("delete-book", parseInt(deleteBookId.value));
+        emit("close");
+      } catch (error) {
+        console.error("Error deleting book:", error);
+      }
     };
 
     return {
