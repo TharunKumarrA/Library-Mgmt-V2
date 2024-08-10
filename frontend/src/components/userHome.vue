@@ -94,11 +94,13 @@ export default {
     const borrowedBooks = ref([]);
 
     onMounted(async () => {
-      // Retrieve username and isAdmin from localStorage
       username.value = localStorage.getItem("username") || "";
       isAdmin.value = localStorage.getItem("isAdmin") === "true";
 
-      // Fetch borrowed books from the API
+      await fetchBorrowedBooks(); // Fetch books on mount
+    });
+
+    const fetchBorrowedBooks = async () => {
       try {
         const response = await axios.get(`/books/borrowed/${username.value}`);
         console.log("API Response:", response.data);
@@ -110,7 +112,7 @@ export default {
       } catch (error) {
         console.error("Failed to fetch borrowed books:", error);
       }
-    });
+    };
 
     const readBook = (title) => {
       const pdfUrl = `${axios.defaults.baseURL}/books/read/${encodeURIComponent(
@@ -120,8 +122,19 @@ export default {
       window.open(pdfUrl, "_blank");
     };
 
-    const revokeBook = (bookId) => {
+    const revokeBook = async (bookId) => {
+      const usernameValue = localStorage.getItem("username");
+      const url = `/revoke/${usernameValue}/${bookId}`;
       console.log(`Revoking book with ID: ${bookId}`);
+      try {
+        const response = await axios.post(url);
+        if (response.status === 200) {
+          console.log("Book successfully revoked.");
+          await fetchBorrowedBooks(); // Refresh the list after revoking the book
+        }
+      } catch (error) {
+        console.error("Error revoking book:", error);
+      }
     };
 
     return {
