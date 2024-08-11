@@ -1,7 +1,8 @@
-from flask import Flask, render_template, request, session, Blueprint, abort, url_for, redirect, jsonify, current_app, send_from_directory
+from flask import Blueprint, request, jsonify, abort, current_app, session, send_from_directory
 import sqlite3, uuid, os
 from werkzeug.utils import secure_filename
 from urllib.parse import unquote
+from extensions import cache
 
 database = 'database.db'
 
@@ -22,6 +23,7 @@ def create_tables():
 create_tables()
 
 ep = Blueprint('endpoints', __name__)
+
 
 @ep.route('/api/login', methods=['POST'])
 def login():
@@ -295,7 +297,6 @@ def manage_books():
             conn.commit()
             cursor.close()
             conn.close()
-
             return 'Book added successfully', 200
 
         elif request.method == 'PUT':
@@ -325,6 +326,7 @@ def manage_books():
             conn.commit()
             cursor.close()
             conn.close()
+
             return 'Book updated successfully', 200
 
         elif request.method == 'DELETE':
@@ -334,7 +336,6 @@ def manage_books():
 
             book_id = data.get('id')
             print(f"Received book_id: {book_id}")
-
 
             # Retrieve book title to construct filename
             cursor.execute('SELECT title FROM books WHERE id = ?', (book_id,))
@@ -352,7 +353,6 @@ def manage_books():
             print(f"File path: {file_path}")
 
             if not os.path.exists(file_path):
-
                 # Delete book from database
                 cursor.execute('DELETE FROM books WHERE id = ?', (book_id,))
                 conn.commit()
@@ -516,7 +516,7 @@ def user_book_requests(username):
     except Exception as e:
         print(f"An error occurred: {e}")
         return 'Internal Server Error', 500
-    
+
 @ep.route('/api/books/borrowed/<string:username>', methods=['GET'])
 def borrowed_books(username):
     try:
@@ -566,11 +566,12 @@ def book_request():
         print(f"An error occurred: {e}")
         return 'Internal Server Error', 500
 
-@ep.route('/api/search', methods=['POST', 'GET'])
+@ep.route('/api/search', methods=['GET'])
+@cache.cached(timeout=60, query_string=True )
 def search():
     try:
       with sqlite3.connect("database.db") as con:
-        data = request.json
+        data = request.args
         if not data or 'title' not in data or 'author' not in data or 'section' not in data:
             abort(400)
         cur = con.cursor()

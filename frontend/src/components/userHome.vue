@@ -85,6 +85,7 @@
 <script>
 import { ref, onMounted } from "vue";
 import axios from "../routers/axios.js"; // Adjust the import path if necessary
+import { useRouter } from 'vue-router';
 
 export default {
   name: "LibraryDashboard",
@@ -92,12 +93,23 @@ export default {
     const username = ref("");
     const isAdmin = ref(false);
     const borrowedBooks = ref([]);
+    const router = useRouter(); // Initialize router
 
     onMounted(async () => {
-      username.value = localStorage.getItem("username") || "";
+      // Check for sessionId or username in localStorage
+      const storedSessionId = localStorage.getItem("sessionId");
+      const storedUsername = localStorage.getItem("username");
+
+      if (!storedSessionId && !storedUsername) {
+        // If neither exists, redirect to login page
+        router.push("/login"); 
+        return;
+      }
+
+      username.value = storedUsername || "";
       isAdmin.value = localStorage.getItem("isAdmin") === "true";
 
-      await fetchBorrowedBooks(); // Fetch books on mount
+      await fetchBorrowedBooks();
     });
 
     const fetchBorrowedBooks = async () => {

@@ -128,7 +128,7 @@ export default {
       this.books = [];
 
       try {
-        const response = await axios.post("/search", this.searchForm);
+        const response = await axios.get("/search", {params: this.searchForm});
 
         if (Array.isArray(response.data.books)) {
           this.books = response.data.books;
